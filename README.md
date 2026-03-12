@@ -1,4 +1,4 @@
-# ENTRUST (Laravel 5 Package -- Updated for Laravel 10.x)
+# ENTRUST (Updated for Laravel 11.x)
 
 [![Build Status](https://travis-ci.org/Zizaco/entrust.svg)](https://travis-ci.org/Zizaco/entrust)
 [![Version](https://img.shields.io/packagist/v/Zizaco/entrust.svg)](https://packagist.org/packages/zizaco/entrust)
@@ -7,7 +7,7 @@
 
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/cc4af966-809b-4fbc-b8b2-bb2850e6711e/small.png)](https://insight.sensiolabs.com/projects/cc4af966-809b-4fbc-b8b2-bb2850e6711e)
 
-Entrust is a succinct and flexible way to add Role-based Permissions to **Laravel 10**.
+Entrust is a succinct and flexible way to add Role-based Permissions to **Laravel 11**.
 
 ## Contents
 
@@ -25,8 +25,6 @@ Entrust is a succinct and flexible way to add Role-based Permissions to **Larave
         - [User ability](#user-ability)
     - [Blade templates](#blade-templates)
     - [Middleware](#middleware)
-    - [Short syntax route filter](#short-syntax-route-filter)
-    - [Route filter](#route-filter)
 - [Troubleshooting](#troubleshooting)
 - [License](#license)
 - [Contribution guidelines](#contribution-guidelines)
@@ -34,10 +32,10 @@ Entrust is a succinct and flexible way to add Role-based Permissions to **Larave
 
 ## Installation
 
-1) In order to install Laravel 10 Entrust, just add the following to your composer.json. Then run `composer update`:
+1) In order to install Laravel 11 Entrust, add the following to your composer.json and run `composer update`:
 
 ```json
-"zizaco/entrust": "dev-laravel-10"
+"zizaco/entrust": "dev-laravel-11"
 ```
 
 2) Open your `config/app.php` and add the following to the `providers` array:
@@ -70,15 +68,23 @@ php artisan vendor:publish
 ],
 ```
 
-6)  If you want to use [Middleware](#middleware) (requires Laravel 5.1 or later) you also need to add the following:
+6) If you want to use [Middleware](#middleware), register the aliases in your `bootstrap/app.php`:
 
 ```php
-    'role' => \Zizaco\Entrust\Middleware\EntrustRole::class,
-    'permission' => \Zizaco\Entrust\Middleware\EntrustPermission::class,
-    'ability' => \Zizaco\Entrust\Middleware\EntrustAbility::class,
+->withMiddleware(function (Middleware $middleware) {
+    $middleware->alias([
+        'role' => \Zizaco\Entrust\Middleware\EntrustRole::class,
+        'permission' => \Zizaco\Entrust\Middleware\EntrustPermission::class,
+        'ability' => \Zizaco\Entrust\Middleware\EntrustAbility::class,
+    ]);
+});
 ```
 
-to `routeMiddleware` array in `app/Http/Kernel.php`.
+Also make sure `Middleware` is imported:
+
+```php
+use Illuminate\Foundation\Configuration\Middleware;
+```
 
 ## Configuration
 
@@ -427,88 +433,10 @@ For more complex situations use `ability` middleware which accepts 3 parameters:
 'middleware' => ['ability:admin|owner,create-post|edit-user,true']
 ```
 
-### Short syntax route filter
+### Legacy Route Filter APIs
 
-To filter a route by permission or role you can call the following in your `app/Http/routes.php`:
-
-```php
-// only users with roles that have the 'manage_posts' permission will be able to access any route within admin/post
-Entrust::routeNeedsPermission('admin/post*', 'create-post');
-
-// only owners will have access to routes within admin/advanced
-Entrust::routeNeedsRole('admin/advanced*', 'owner');
-
-// optionally the second parameter can be an array of permissions or roles
-// user would need to match all roles or permissions for that route
-Entrust::routeNeedsPermission('admin/post*', array('create-post', 'edit-comment'));
-Entrust::routeNeedsRole('admin/advanced*', array('owner','writer'));
-```
-
-Both of these methods accept a third parameter.
-If the third parameter is null then the return of a prohibited access will be `App::abort(403)`, otherwise the third parameter will be returned.
-So you can use it like:
-
-```php
-Entrust::routeNeedsRole('admin/advanced*', 'owner', Redirect::to('/home'));
-```
-
-Furthermore both of these methods accept a fourth parameter.
-It defaults to true and checks all roles/permissions given.
-If you set it to false, the function will only fail if all roles/permissions fail for that user.
-Useful for admin applications where you want to allow access for multiple groups.
-
-```php
-// if a user has 'create-post', 'edit-comment', or both they will have access
-Entrust::routeNeedsPermission('admin/post*', array('create-post', 'edit-comment'), null, false);
-
-// if a user is a member of 'owner', 'writer', or both they will have access
-Entrust::routeNeedsRole('admin/advanced*', array('owner','writer'), null, false);
-
-// if a user is a member of 'owner', 'writer', or both, or user has 'create-post', 'edit-comment' they will have access
-// if the 4th parameter is true then the user must be a member of Role and must have Permission
-Entrust::routeNeedsRoleOrPermission(
-    'admin/advanced*',
-    array('owner', 'writer'),
-    array('create-post', 'edit-comment'),
-    null,
-    false
-);
-```
-
-### Route filter
-
-Entrust roles/permissions can be used in filters by simply using the `can` and `hasRole` methods from within the Facade:
-
-```php
-Route::filter('manage_posts', function()
-{
-    // check the current user
-    if (!Entrust::can('create-post')) {
-        return Redirect::to('admin');
-    }
-});
-
-// only users with roles that have the 'manage_posts' permission will be able to access any admin/post route
-Route::when('admin/post*', 'manage_posts');
-```
-
-Using a filter to check for a role:
-
-```php
-Route::filter('owner_role', function()
-{
-    // check the current user
-    if (!Entrust::hasRole('Owner')) {
-        App::abort(403);
-    }
-});
-
-// only owners will have access to routes within admin/advanced
-Route::when('admin/advanced*', 'owner_role');
-```
-
-As you can see `Entrust::hasRole()` and `Entrust::can()` checks if the user is logged in, and then if he or she has the role or permission.
-If the user is not logged the return will also be `false`.
+The facade helpers `routeNeedsRole`, `routeNeedsPermission`, and `routeNeedsRoleOrPermission` were removed for Laravel 11 support.
+Use middleware aliases (`role`, `permission`, `ability`) for route protection.
 
 ## Troubleshooting
 

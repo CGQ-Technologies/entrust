@@ -1,9 +1,11 @@
 <?php
 
+require_once __DIR__.'/MiddlewareTestCase.php';
+
 use Zizaco\Entrust\Middleware\EntrustPermission;
 use Mockery as m;
 
-class EntrustPermissionTest extends MiddlewareTest
+class EntrustPermissionTest extends MiddlewareTestCase
 {
     public function testHandle_IsGuestWithNoPermission_ShouldAbort403()
     {
@@ -25,7 +27,7 @@ class EntrustPermissionTest extends MiddlewareTest
         $guard->shouldReceive('guest')->andReturn(true);
         $request->user()->shouldReceive('can')->andReturn(false);
 
-        $middleware->handle($request, function () {}, null, null, true);
+        $middleware->handle($request, function () {}, 'manage-admins');
 
         /*
         |------------------------------------------------------------
@@ -55,7 +57,7 @@ class EntrustPermissionTest extends MiddlewareTest
         $guard->shouldReceive('guest')->andReturn(true);
         $request->user()->shouldReceive('can')->andReturn(true);
 
-        $middleware->handle($request, function () {}, null, null);
+        $middleware->handle($request, function () {}, 'manage-admins');
 
         /*
         |------------------------------------------------------------
@@ -85,7 +87,7 @@ class EntrustPermissionTest extends MiddlewareTest
         $guard->shouldReceive('guest')->andReturn(false);
         $request->user()->shouldReceive('can')->andReturn(false);
 
-        $middleware->handle($request, function () {}, null, null);
+        $middleware->handle($request, function () {}, 'manage-admins');
 
         /*
         |------------------------------------------------------------
@@ -115,7 +117,7 @@ class EntrustPermissionTest extends MiddlewareTest
         $guard->shouldReceive('guest')->andReturn(false);
         $request->user()->shouldReceive('can')->andReturn(true);
 
-        $middleware->handle($request, function () {}, null, null);
+        $middleware->handle($request, function () {}, 'manage-admins');
 
         /*
         |------------------------------------------------------------

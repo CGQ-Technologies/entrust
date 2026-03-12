@@ -1,9 +1,11 @@
 <?php
 
+require_once __DIR__.'/MiddlewareTestCase.php';
+
 use Zizaco\Entrust\Middleware\EntrustAbility;
 use Mockery as m;
 
-class EntrustAbilityTest extends MiddlewareTest
+class EntrustAbilityTest extends MiddlewareTestCase
 {
     public function testHandle_IsGuestWithNoAbility_ShouldAbort403()
     {
@@ -25,7 +27,7 @@ class EntrustAbilityTest extends MiddlewareTest
         $guard->shouldReceive('guest')->andReturn(true);
         $request->user()->shouldReceive('ability')->andReturn(false);
 
-        $middleware->handle($request, function () {}, null, null, true);
+        $middleware->handle($request, function () {}, 'admin', 'manage-admins', true);
 
         /*
         |------------------------------------------------------------
@@ -55,7 +57,7 @@ class EntrustAbilityTest extends MiddlewareTest
         $guard->shouldReceive('guest')->andReturn(true);
         $request->user()->shouldReceive('ability')->andReturn(true);
 
-        $middleware->handle($request, function () {}, null, null);
+        $middleware->handle($request, function () {}, 'admin', 'manage-admins');
 
         /*
         |------------------------------------------------------------
@@ -85,7 +87,7 @@ class EntrustAbilityTest extends MiddlewareTest
         $guard->shouldReceive('guest')->andReturn(false);
         $request->user()->shouldReceive('ability')->andReturn(false);
 
-        $middleware->handle($request, function () {}, null, null);
+        $middleware->handle($request, function () {}, 'admin', 'manage-admins');
 
         /*
         |------------------------------------------------------------
@@ -115,7 +117,7 @@ class EntrustAbilityTest extends MiddlewareTest
         $guard->shouldReceive('guest')->andReturn(false);
         $request->user()->shouldReceive('ability')->andReturn(true);
 
-        $middleware->handle($request, function () {}, null, null);
+        $middleware->handle($request, function () {}, 'admin', 'manage-admins');
 
         /*
         |------------------------------------------------------------

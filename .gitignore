@@ -18,5 +18,6 @@ Thumbs.db
 
 # sublime phpintel plugin
 /.phpintel
+.phpunit.cache/
 
 tags
