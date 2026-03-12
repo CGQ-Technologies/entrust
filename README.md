@@ -1,4 +1,4 @@
-# ENTRUST (Updated for Laravel 11.x)
+# ENTRUST (Updated for Laravel 11.x / 12.x)
 
 [![Build Status](https://travis-ci.org/Zizaco/entrust.svg)](https://travis-ci.org/Zizaco/entrust)
 [![Version](https://img.shields.io/packagist/v/Zizaco/entrust.svg)](https://packagist.org/packages/zizaco/entrust)
@@ -7,7 +7,7 @@
 
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/cc4af966-809b-4fbc-b8b2-bb2850e6711e/small.png)](https://insight.sensiolabs.com/projects/cc4af966-809b-4fbc-b8b2-bb2850e6711e)
 
-Entrust is a succinct and flexible way to add Role-based Permissions to **Laravel 11**.
+Entrust is a succinct and flexible way to add Role-based Permissions to **Laravel 11 and Laravel 12**.
 
 ## Contents
 
@@ -32,10 +32,10 @@ Entrust is a succinct and flexible way to add Role-based Permissions to **Larave
 
 ## Installation
 
-1) In order to install Laravel 11 Entrust, add the following to your composer.json and run `composer update`:
+1) In order to install Laravel 11/12 Entrust, add the following to your composer.json and run `composer update`:
 
 ```json
-"zizaco/entrust": "dev-laravel-11"
+"zizaco/entrust": "dev-laravel-12"
 ```
 
 2) Open your `config/app.php` and add the following to the `providers` array:
@@ -435,7 +435,7 @@ For more complex situations use `ability` middleware which accepts 3 parameters:
 
 ### Legacy Route Filter APIs
 
-The facade helpers `routeNeedsRole`, `routeNeedsPermission`, and `routeNeedsRoleOrPermission` were removed for Laravel 11 support.
+The facade helpers `routeNeedsRole`, `routeNeedsPermission`, and `routeNeedsRoleOrPermission` were removed during Laravel 11+ modernization.
 Use middleware aliases (`role`, `permission`, `ability`) for route protection.
 
 ## Troubleshooting
